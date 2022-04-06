@@ -1,0 +1,56 @@
+ul {
+  margin: 1rem 0 0 1rem;
+  padding: 0;
+}
+
+li {
+  position: relative;
+  list-style: none;
+  padding-bottom: 1rem;
+  padding-left: 1rem;
+}
+
+li::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: -5px;
+  bottom: -7px;
+  right: 0;
+  width: 1rem;
+  border-left: solid 2px;
+  border-top: solid 2px;
+}
+
+li::after {
+    content: "";
+    position: absolute;
+    top: -15px;
+    left: -5px;
+    bottom: 1rem;
+    right: 0;
+    width: 1rem;
+    border-left: solid 2px;
+  }
+ul:nth-child(1) > li::after {
+display: none;
+}
+
+li:last-of-type {
+  padding-bottom: 0;
+}
+li:last-of-type::before {
+  border-left: none;
+  border-right: solid 2px;
+  transform: rotate(180deg);
+  top: -15px;
+  bottom: 9px;
+}
+
+li > input:checked ~ ul {
+    display: block;
+}
+
+li > ul {
+  display: none;
+}
