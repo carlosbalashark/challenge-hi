@@ -22,16 +22,15 @@ const itemTree = (item, id, stateItemTree) => {
 const createItemTree = (id_parent, item, stateItemTree) => {
   if (id_parent) {
     const parent = document.getElementById(id_parent);
-
+    let parent_ul = parent.getElementsByTagName("ul")[0];
     // check ul of parent exist
-    if (parent.getElementsByTagName("ul")[0]) {
-      const ul = parent.getElementsByTagName("ul")[0];
-      ul.append(itemTree(item, item.id, stateItemTree));
-      parent.append(ul);
+    if (parent_ul) {
+      parent_ul.append(itemTree(item, item.id, stateItemTree));
+      parent.append(parent_ul);
     } else {
-      const ul = document.createElement("ul");
-      ul.append(itemTree(item, item.id, stateItemTree));
-      parent.append(ul);
+      parent_ul = document.createElement("ul");
+      parent_ul.append(itemTree(item, item.id, stateItemTree));
+      parent.append(parent_ul);
     }
   } else {
     tree.append(itemTree(item, item.id, stateItemTree));
@@ -39,7 +38,7 @@ const createItemTree = (id_parent, item, stateItemTree) => {
 };
 
 const createTree = (obj, id_parent) => {
-  for (var k in obj) {
+  for (let k in obj) {
     const item = obj[k];
     const stateItemTree = stateItemsTree(itemTree(item, item.id));
     createItemTree(id_parent, item, stateItemTree);
@@ -73,18 +72,7 @@ const stateItemsTree = (element, check) => {
   return elementStatus;
 };
 
-createTree(data);
-
-tree.addEventListener("change", (e) => {
-  let check = e.target;
-
-  const children = arrayItemsTree("input", check.parentNode);
-  children.forEach((child) => {
-    child.checked = check.checked;
-    stateItemsTree(child.parentNode, child.checked);
-    collapseItemsTree(child);
-  });
-
+const setIndeterminate = (check) => {
   while (check) {
     const parent = check.closest(["ul"])?.parentNode.querySelector("input");
     const siblings = arrayItemsTree(
@@ -102,4 +90,26 @@ tree.addEventListener("change", (e) => {
     // prepare for next loop
     check = check != parent ? parent : 0;
   }
+};
+
+// wait for the content to be loaded to set the indeterminate
+document.addEventListener("DOMContentLoaded", function (event) {
+  const items_tree = arrayItemsTree("input", tree.children.parentNode);
+  items_tree.map((check) => {
+    setIndeterminate(check);
+  });
 });
+
+// set state, indeterminate and collapse when the tree changes
+tree.addEventListener("change", (e) => {
+  let check = e.target;
+  const children = arrayItemsTree("input", check.parentNode);
+  children.forEach((child) => {
+    child.checked = check.checked;
+    stateItemsTree(child.parentNode, child.checked);
+    setIndeterminate(check);
+    collapseItemsTree(child);
+  });
+});
+
+createTree(data);
